@@ -15,8 +15,6 @@ public class BillGenerator {
             printer.printItem(call.date(), call.callee(), call.durationMinutes(), MoneyFormatter.penceToPounds(call.cost()));
         }
         printer.printTotal(totalBill);
-        
-        
     }
 
 }
