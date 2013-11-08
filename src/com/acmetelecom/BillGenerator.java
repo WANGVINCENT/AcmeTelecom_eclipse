@@ -16,9 +16,7 @@ public class BillGenerator {
         }
         printer.printTotal(totalBill);
         
-        //qdqsd
-
-        //wangnan
+        
     }
 
 }
