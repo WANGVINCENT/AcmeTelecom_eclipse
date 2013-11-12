@@ -3,14 +3,24 @@ package com.acmetelecom;
 import java.util.Calendar;
 import java.util.Date;
 
+
 public class DateUtility {
 	
 	private static Calendar calendar = Calendar.getInstance();
+	private static int PEAKSTARTTIME;
+	private static int PEAKENDTIME;
 	
-	//Test if the call time is during the 7h-19h period
+	//Test if the time is during the peak period
 	public static boolean isInPeakPeriod(Date time) {
-    	int hour = getHour(time);
-        return hour >= 7 && hour < 19;
+		
+		try {
+			PEAKSTARTTIME = Integer.valueOf(Property.getInstance().getProperty("peakstarttime"));
+			PEAKENDTIME = Integer.valueOf(Property.getInstance().getProperty("peakendtime"));
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
+		}
+		
+    	return getHour(time) >= PEAKSTARTTIME  && getHour(time) < PEAKENDTIME;
     }
 	
 	//Get the hour of the day for a given time
@@ -30,4 +40,12 @@ public class DateUtility {
 		calendar.setTime(time);
         return calendar.get(Calendar.SECOND);
     }
+
+	public static int getPeakstarttime() {
+		return PEAKSTARTTIME;
+	}
+
+	public static int getPeakendtime() {
+		return PEAKENDTIME;
+	}
 }

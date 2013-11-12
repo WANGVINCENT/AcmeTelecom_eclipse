@@ -4,7 +4,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Call {
-    private CallEvent start;
+    
+	private CallEvent start;
     private CallEvent end;
     private Type type;
     private final int SECONDS_IN_DAY = 24 * 60 * 60;
@@ -19,20 +20,18 @@ public class Call {
         return start.getCallee();
     }
 	
-	
-    
-    //Calculate the on peak duration time in second according to different types
+	//Calculate the on peak duration time in second according to different types
     public int onPeakDurationSeconds(Type type) {
     	int time = 0;
     	
     	switch(type) {
-    		case isBetweenSeven:
-				time = (DateUtility.getHour(endTime()) - 7) * SECONDS_IN_HOUR 
+    		case isBetweenStartTime:
+				time = (DateUtility.getHour(endTime()) - DateUtility.getPeakstarttime()) * SECONDS_IN_HOUR 
 						+ DateUtility.getMinute(endTime()) * 60 
 						+ DateUtility.getSecond(endTime());
 				break;
-    		case isBetweenNineteen: 
-				time = (DateUtility.getHour(endTime()) - 19) * SECONDS_IN_HOUR 
+    		case isBetweenEndTime: 
+				time = (DateUtility.getHour(endTime()) - DateUtility.getPeakendtime()) * SECONDS_IN_HOUR 
 						+ DateUtility.getMinute(endTime()) * 60 
 						+ DateUtility.getSecond(endTime());
 				break;
@@ -46,7 +45,7 @@ public class Call {
     			time = SECONDS_IN_DAY / 2;
     			break;
     		case isCoverOffPeak:
-    			time = (19 - DateUtility.getHour(endTime()) + DateUtility.getHour(startTime()) - 7) * SECONDS_IN_HOUR;
+    			time = (DateUtility.getPeakendtime() - DateUtility.getHour(endTime()) + DateUtility.getHour(startTime()) - DateUtility.getPeakstarttime()) * SECONDS_IN_HOUR;
     			break;
 		}
     	
@@ -58,12 +57,12 @@ public class Call {
     	int time = 0;
     	
     	switch(type) {
-    		case isBetweenSeven:
+    		case isBetweenStartTime:
 				time = (7 - DateUtility.getHour(startTime())) * SECONDS_IN_HOUR 
 						+ DateUtility.getMinute(startTime()) * 60 
 						+ DateUtility.getSecond(startTime());
 				break;
-    		case isBetweenNineteen: 
+    		case isBetweenEndTime: 
 				time = (19 - DateUtility.getHour(startTime())) * SECONDS_IN_HOUR 
 						+ DateUtility.getMinute(startTime()) * 60 
 						+ DateUtility.getSecond(startTime());
@@ -106,17 +105,17 @@ public class Call {
     //Get the type of the call
     public Type getType() {
     	
-    	//if start time is between 7H and 19H
+    	//if start time is in peak period
     	boolean startTimeType = DateUtility.isInPeakPeriod(startTime());
-    	//if end time is between 7H and 19H
+    	//if end time is in peak period
     	boolean endTimeType = DateUtility.isInPeakPeriod(endTime());
     	
-    	//Assume that all calls period are less than 24 hours
+    	//Assuming that all calls periods are less than 24 hours
     	if(durationSeconds() < SECONDS_IN_DAY) {
     		if(!startTimeType && endTimeType) {
-    	    	type = Type.isBetweenSeven; 	//the type that start time and end time is between 7H
+    	    	type = Type.isBetweenStartTime; 	//the type that start time and end time is between start time
     	    } else if(startTimeType && !endTimeType){
-    	    	type = Type.isBetweenNineteen;	//the type that start time and end time is between 19H
+    	    	type = Type.isBetweenEndTime;	//the type that start time and end time is between end time
     	    } else if(startTimeType && endTimeType && durationSeconds() < SECONDS_IN_DAY / 2) {
     	    	type = Type.isOnPeak;			//the type of both time are in peak period
     	    } else if (startTimeType && endTimeType && durationSeconds() > SECONDS_IN_DAY / 2) {
@@ -128,7 +127,6 @@ public class Call {
     	    }
     	}
     	
-		
-    	return type;
+		return type;
     }
 }
